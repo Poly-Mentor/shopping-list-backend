@@ -5,7 +5,6 @@ class BaseUser(SQLModel):
 
 class User(BaseUser, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    name: str
 
 class UserCreate(BaseUser):
     pass
