@@ -15,15 +15,15 @@ async def get_user(user_id : int, user: User = Depends(service.user.get_user_by_
     return user
 
 @router.post("/")
-async def create_user(user: UserCreate, newUser : User = Depends(service.user.create_user)) -> User:
+async def create_user(new_user_data: UserCreate, newUser : User = Depends(service.user.create_user)) -> User:
     """Create a new user."""
     return newUser
-
-@router.delete("/{user_id}")
-async def delete_user(user_id: int, deletingResult : dict = Depends(service.user.delete_user)) -> dict:
-    return deletingResult
 
 @router.patch("/{user_id}")
 async def update_user(user_id: int, userAfterUpdate : User = Depends(service.user.update_user)) -> User:
     """Update an existing user."""
     return userAfterUpdate
+
+@router.delete("/{user_id}")
+async def delete_user(user_id: int, deletingResult : dict = Depends(service.user.delete_user)) -> dict:
+    return deletingResult

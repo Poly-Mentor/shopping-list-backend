@@ -18,9 +18,9 @@ def get_user_by_id(user_id: int, session: Session = Depends(db.get_session)) -> 
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-def create_user(user: UserCreate, session: Session = Depends(db.get_session)) -> User:
+def create_user(new_user_data: UserCreate, session: Session = Depends(db.get_session)) -> User:
     """Create a new user in the database."""
-    new_user = User(name=user.name)
+    new_user = User(name=new_user_data.name)
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
