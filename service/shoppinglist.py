@@ -3,21 +3,21 @@ from data import db
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
 
-def get_all_lists(session: Session = Depends(db.get_session)) -> list[ShoppingList]:
+async def get_all_lists(session: Session = Depends(db.get_session)) -> list[ShoppingList]:
     """Fetch all lists from the database."""
     lists: list[ShoppingList] = session.exec(select(ShoppingList)).all()
     if not lists:
         raise HTTPException(status_code=404, detail="No lists found")
     return lists
 
-def get_list_by_id(list_id: int, session: Session = Depends(db.get_session)) -> ShoppingList:
+async def get_list_by_id(list_id: int, session: Session = Depends(db.get_session)) -> ShoppingList:
     """Fetch a list by ID from the database."""
     shopping_list = session.exec(select(ShoppingList).where(ShoppingList.id == list_id)).first()
     if not shopping_list:
         raise HTTPException(status_code=404, detail="List not found")
     return shopping_list
 
-def create_list(new_list_data: BaseShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
+async def create_list(new_list_data: BaseShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
     """Create a new list in the database."""
     new_list = ShoppingList(name=new_list_data.name)
     session.add(new_list)
@@ -25,7 +25,7 @@ def create_list(new_list_data: BaseShoppingList, session: Session = Depends(db.g
     session.refresh(new_list)
     return new_list
 
-def update_list(list_id: int, new_list_data: ShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
+async def update_list(list_id: int, new_list_data: ShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
     """Update existing list in the database."""
     existing_list = session.exec(select(ShoppingList).where(ShoppingList.id == list_id)).first()
     if not existing_list:
@@ -38,7 +38,7 @@ def update_list(list_id: int, new_list_data: ShoppingList, session: Session = De
     return existing_list
     
 
-def delete_list(list_id: int, session: Session = Depends(db.get_session)) -> dict:
+async def delete_list(list_id: int, session: Session = Depends(db.get_session)) -> dict:
     """Delete a list by ID from the database."""
     shopping_list = session.exec(select(ShoppingList).where(ShoppingList.id == list_id)).first()
     if not shopping_list:
