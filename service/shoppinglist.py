@@ -12,7 +12,7 @@ async def get_all_lists(session: Session = Depends(db.get_session)) -> list[Shop
 
 async def get_list_by_id(list_id: int, session: Session = Depends(db.get_session)) -> ShoppingList:
     """Fetch a list by ID from the database."""
-    shopping_list = session.exec(select(ShoppingList).where(ShoppingList.id == list_id)).first()
+    shopping_list = session.get(ShoppingList, list_id)
     if not shopping_list:
         raise HTTPException(status_code=404, detail="List not found")
     return shopping_list
@@ -27,9 +27,7 @@ async def create_list(new_list_data: BaseShoppingList, session: Session = Depend
 
 async def update_list(list_id: int, new_list_data: ShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
     """Update existing list in the database."""
-    existing_list = session.exec(select(ShoppingList).where(ShoppingList.id == list_id)).first()
-    if not existing_list:
-        raise HTTPException(status_code=404, detail="List not found")
+    existing_list = await get_list_by_id(list_id, session)
     if new_list_data.name is not None:
         existing_list.name = new_list_data.name
     session.add(existing_list)
@@ -40,9 +38,7 @@ async def update_list(list_id: int, new_list_data: ShoppingList, session: Sessio
 
 async def delete_list(list_id: int, session: Session = Depends(db.get_session)) -> dict:
     """Delete a list by ID from the database."""
-    shopping_list = session.exec(select(ShoppingList).where(ShoppingList.id == list_id)).first()
-    if not shopping_list:
-        raise HTTPException(status_code=404, detail="List not found")
+    shopping_list = await get_list_by_id(list_id, session)
     session.delete(shopping_list)
     session.commit()
     return {"detail": "List deleted successfully"}

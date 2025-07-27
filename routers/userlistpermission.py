@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from models import UserListPermission
 import service.userlistpermission
 
 router = APIRouter(prefix="/listperm")
@@ -16,9 +15,9 @@ async def check_user_list_permission(
 async def grant_user_list_permission(
     user_id: int,
     list_id: int,
-    created_permission: UserListPermission = Depends(service.userlistpermission.grant_access_to_list)
-) -> UserListPermission:
-    return created_permission
+    result: dict = Depends(service.userlistpermission.grant_access_to_list)
+) -> dict:
+    return result
 
 @router.delete("/")
 async def revoke_user_list_permission(
