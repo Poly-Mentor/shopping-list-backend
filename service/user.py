@@ -28,7 +28,7 @@ async def create_user(new_user_data: UserCreate, session: Session = Depends(db.g
 
 async def delete_user(user_id: int, session: Session = Depends(db.get_session)) -> dict:
     """Delete a user by ID from the database."""
-    user = session.exec(select(User).where(User.id == user_id)).first()
+    user: User | None = session.exec(select(User).where(User.id == user_id)).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     session.delete(user)

@@ -5,12 +5,12 @@ import service.user
 router = APIRouter(prefix="/user")
 
 @router.get("/")
-async def get_user(users: list[User] = Depends(service.user.get_all_users)) -> list[User]:
+async def get_users(users: list[User] = Depends(service.user.get_all_users)) -> list[User]:
     """Fetch all users."""
     return users
 
 @router.get("/{user_id}")
-async def get_user(user_id : int, user: User = Depends(service.user.get_user_by_id) ) -> User:
+async def get_user_by_id(user_id : int, user: User = Depends(service.user.get_user_by_id) ) -> User:
     """Fetch a user by ID."""
     return user
 

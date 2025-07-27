@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from routers import user, shoppinglist
+from routers import user, shoppinglist, userlistpermission
 
 from data import db
 
@@ -22,6 +22,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(user.router)
 app.include_router(shoppinglist.router)
+app.include_router(userlistpermission.router)
 
 @app.get("/")
 async def root():
