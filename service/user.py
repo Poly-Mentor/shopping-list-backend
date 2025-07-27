@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException
 
 async def get_all_users(session: Session = Depends(db.get_session)) -> list[User]:
     """Fetch all users from the database."""
-    users: list[User] = session.exec(select(User)).all()
+    users: list[User] = list(session.exec(select(User)).all())
     if not users:
         raise HTTPException(status_code=404, detail="No users found")
     return users

@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException
 
 async def get_all_lists(session: Session = Depends(db.get_session)) -> list[ShoppingList]:
     """Fetch all lists from the database."""
-    lists: list[ShoppingList] = session.exec(select(ShoppingList)).all()
+    lists: list[ShoppingList] = list(session.exec(select(ShoppingList)).all())
     if not lists:
         raise HTTPException(status_code=404, detail="No lists found")
     return lists
