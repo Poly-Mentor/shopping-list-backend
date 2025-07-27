@@ -1,4 +1,4 @@
-from models.user import User, UserCreate
+from models import User, UserCreate
 from data import db
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException

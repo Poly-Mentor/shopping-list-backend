@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from models.user import User, UserCreate
+from models import User, UserCreate
 import service.user
 
 router = APIRouter(prefix="/user")

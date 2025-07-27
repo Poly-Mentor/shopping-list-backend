@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException
 from sqlmodel import Session, select
 from typing import Annotated
 from data import db
-from models.userlistpermission import UserListPermission
+from models import UserListPermission
 
 DBSessionDep = Annotated[Session, Depends(db.get_session)]
 

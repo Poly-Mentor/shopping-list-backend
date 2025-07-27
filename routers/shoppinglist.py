@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from models.shoppinglist import ShoppingList, ShoppingListCreate
+from models import ShoppingList, ShoppingListCreate
 import service.shoppinglist
 
 router = APIRouter(prefix="/shoppinglist")

@@ -1,4 +1,4 @@
-from models.shoppinglist import BaseShoppingList, ShoppingList
+from models import BaseShoppingList, ShoppingList
 from data import db
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from models.userlistpermission import UserListPermission
+from models import UserListPermission
 import service.userlistpermission
 
 router = APIRouter(prefix="/listperm")
