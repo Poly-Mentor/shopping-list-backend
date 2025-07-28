@@ -1,5 +1,5 @@
-from models import User, UserCreate, ShoppingList
-from data import db
+from app.models import User, UserCreate, ShoppingList
+from app.data import db
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
 

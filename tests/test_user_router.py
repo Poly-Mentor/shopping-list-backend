@@ -1,10 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from app.main import app
 from app.models import User, UserCreate, ShoppingList, UserListPermission
-
-client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_get_users(client: TestClient, session: Session):

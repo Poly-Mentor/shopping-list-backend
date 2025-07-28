@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-import service.userlistpermission
+import app.service.userlistpermission
 
 router = APIRouter(prefix="/listperm")
 
@@ -7,7 +7,7 @@ router = APIRouter(prefix="/listperm")
 async def check_user_list_permission(
     user_id: int,
     list_id: int,
-    has_access: bool = Depends(service.userlistpermission.user_has_access_to_list)
+    has_access: bool = Depends(app.service.userlistpermission.user_has_access_to_list)
 ) -> bool:
     return has_access
 
@@ -15,7 +15,7 @@ async def check_user_list_permission(
 async def grant_user_list_permission(
     user_id: int,
     list_id: int,
-    result: dict = Depends(service.userlistpermission.grant_access_to_list)
+    result: dict = Depends(app.service.userlistpermission.grant_access_to_list)
 ) -> dict:
     return result
 
@@ -23,7 +23,6 @@ async def grant_user_list_permission(
 async def revoke_user_list_permission(
     user_id: int,
     list_id: int,
-    result: dict = Depends(service.userlistpermission.revoke_access_to_list)
+    result: dict = Depends(app.service.userlistpermission.revoke_access_to_list)
 ) -> dict:
     return result
-    

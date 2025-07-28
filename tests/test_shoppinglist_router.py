@@ -1,10 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from app.main import app
 from app.models import ShoppingList, ShoppingItem, User, UserListPermission
-
-client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_get_shopping_lists(client: TestClient, session: Session):

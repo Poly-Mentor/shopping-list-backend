@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from routers import user, shoppinglist, userlistpermission
+from app.routers import user, shoppinglist, userlistpermission
 
-from data import db
+from app.data import db
 
 if getenv("ENVIRONMENT") == "development":
     load_dotenv()
@@ -13,6 +13,7 @@ if getenv("ENVIRONMENT") == "development":
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # things to do before the app starts
+    # Always create tables, the test setup will handle test database creation
     db.create_db_and_tables()
     yield
     # Cleanup actions can be added here if needed

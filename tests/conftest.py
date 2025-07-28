@@ -1,32 +1,65 @@
 import pytest
+import os
 from sqlmodel import SQLModel, create_engine, Session
 from fastapi.testclient import TestClient
-from app.main import app
-from app.data.db import get_session
+from app.data.db import get_session, set_test_engine
 from app.models import User, ShoppingList, UserListPermission, ShoppingItem
 
+# Set the TESTING environment variable
+os.environ["TESTING"] = "1"
+
 # Create an in-memory SQLite database for testing
-@pytest.fixture(name="engine")
+@pytest.fixture(name="engine", scope="function")
 def engine_fixture():
     # Use an in-memory SQLite database for testing
-    engine = create_engine("sqlite:///:memory:", echo=True)
+    # Add check_same_thread=False to allow usage across threads
+    engine = create_engine("sqlite:///:memory:", echo=True, connect_args={"check_same_thread": False})
+    # Set the test engine for the app
+    set_test_engine(engine)
+    # Create all tables for the test engine
+    from sqlmodel import SQLModel
     SQLModel.metadata.create_all(engine)
     yield engine
-    SQLModel.metadata.drop_all(engine)
+    # Reset the test engine
+    set_test_engine(None)
 
-@pytest.fixture(name="session")
+@pytest.fixture(name="session", scope="function")
 def session_fixture(engine):
-    with Session(engine) as session:
-        yield session
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = Session(bind=connection)
+    yield session
+    session.close()
+    transaction.rollback()
+    connection.close()
 
-@pytest.fixture(name="client")
-def client_fixture(engine):
+@pytest.fixture(name="client", scope="function")
+def client_fixture(engine, session):
+    # Create a fresh app instance for each test to ensure it uses the test engine
+    from fastapi import FastAPI
+    from contextlib import asynccontextmanager
+    from app.routers import user, shoppinglist, userlistpermission
+    from app.data import db
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        # Create tables for the test engine
+        SQLModel.metadata.create_all(engine)
+        yield
+        # Cleanup actions can be added here if needed
+
+    app = FastAPI(lifespan=lifespan)
+    app.include_router(user.router)
+    app.include_router(shoppinglist.router)
+    app.include_router(userlistpermission.router)
+
     # Override the get_session dependency with our test session
     def get_session_override():
-        with Session(engine) as session:
-            yield session
+        yield session
 
-    app.dependency_overrides[get_session] = get_session_override
+    # Override only the get_session dependency
+    app.dependency_overrides[db.get_session] = get_session_override
+
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()

@@ -1,5 +1,5 @@
-from models import *
-from data import db
+from app.models import *
+from app.data import db
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
 
