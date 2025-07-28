@@ -30,6 +30,7 @@ async def create_user(new_user_data: UserCreate, session: Session = Depends(db.g
 async def delete_user(user_id: int, session: Session = Depends(db.get_session)) -> dict:
     """Delete a user by ID from the database."""
     user: User | None = await get_user_by_id(user_id, session)
+    # related permissions are being deleted automatically ondelete="CASCADE"
     session.delete(user)
     session.commit()
     return {"detail": "User deleted successfully"}

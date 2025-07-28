@@ -39,15 +39,7 @@ async def update_list(list_id: int, new_list_data: ShoppingList, session: Sessio
 async def delete_list(list_id: int, session: Session = Depends(db.get_session)) -> dict:
     """Delete list and its items from the database."""
     shopping_list = await get_list_by_id(list_id, session)
-    # delete permissions to list
-    perms = session.exec(select(UserListPermission).where(UserListPermission.list_id == list_id)).all()
-    for perm in perms:
-        session.delete(perm)
-    # delete child items
-    if shopping_list.items:
-        for item in shopping_list.items:
-            session.delete(item)
-    # delete list itself
+    # permissions and child items are deleted automatically (ondelete="CASCADE")
     session.delete(shopping_list)
     session.commit()
     return {"detail": "List deleted successfully"}

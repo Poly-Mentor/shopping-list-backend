@@ -5,8 +5,8 @@ from sqlmodel import SQLModel, Field, Relationship
 ###########################################################
 
 class UserListPermission(SQLModel, table=True):
-    user_id: int = Field(primary_key=True, foreign_key="user.id")
-    list_id: int = Field(primary_key=True, foreign_key="shoppinglist.id")
+    user_id: int = Field(primary_key=True, foreign_key="user.id", ondelete="CASCADE")
+    list_id: int = Field(primary_key=True, foreign_key="shoppinglist.id", ondelete="CASCADE")
 
 ###########################################################
 # USER
@@ -18,6 +18,7 @@ class BaseUser(SQLModel):
 class User(BaseUser, table=True):
     id: int | None = Field(default=None, primary_key=True)
     lists: list["ShoppingList"] | None = Relationship(back_populates="users", link_model=UserListPermission)
+    # owned_lists: list["ShoppingList"] = Relationship(back_populates="owner")
 
 class UserCreate(BaseUser):
     pass
@@ -32,7 +33,9 @@ class BaseShoppingList(SQLModel):
 class ShoppingList(BaseShoppingList, table=True):
     id: int | None = Field(default=None, primary_key=True)
     users: list[User] | None = Relationship(back_populates="lists", link_model=UserListPermission)
-    items: list["ShoppingItem"] | None = Relationship(back_populates="parent_list")
+    items: list["ShoppingItem"] | None = Relationship(back_populates="parent_list", cascade_delete=True)
+    # owner_id: int = Field(foreign_key="user.id")
+    # owner: User = Relationship(back_populates="owned_lists")
 
 class ShoppingListCreate(BaseShoppingList):
     pass
@@ -48,7 +51,7 @@ class BaseShoppingItem(SQLModel):
 
 class ShoppingItem(BaseShoppingItem, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    parent_list_id: int = Field(foreign_key="shoppinglist.id")
+    parent_list_id: int = Field(foreign_key="shoppinglist.id", ondelete="CASCADE")
     parent_list: ShoppingList = Relationship(back_populates="items")
 
 class ShoppingItemCreate(BaseShoppingItem):
