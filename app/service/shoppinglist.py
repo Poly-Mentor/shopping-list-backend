@@ -1,4 +1,4 @@
-from models import BaseShoppingList, ShoppingList, ShoppingItem, ShoppingItemCreate
+from models import *
 from data import db
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
@@ -16,24 +16,6 @@ async def get_list_by_id(list_id: int, session: Session = Depends(db.get_session
     if not shopping_list:
         raise HTTPException(status_code=404, detail="List not found")
     return shopping_list
-
-async def add_item(
-        list_id: int,
-        input_item: ShoppingItemCreate,
-        session: Session = Depends(db.get_session)
-) -> ShoppingItem:
-    parent_list = await get_list_by_id(list_id, session)
-    if not parent_list.items:
-        parent_list.items = []
-    ShoppingItemCreate.model_validate(input_item)
-    init_data = input_item.model_dump()
-    init_data.update({"parent_list_id" : parent_list.id})
-    new_item = ShoppingItem(**init_data)
-    parent_list.items.append
-    session.add(new_item)
-    session.commit()
-    session.refresh(new_item)
-    return new_item
 
 async def create_list(new_list_data: BaseShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
     """Create a new list in the database."""
@@ -55,14 +37,43 @@ async def update_list(list_id: int, new_list_data: ShoppingList, session: Sessio
     
 
 async def delete_list(list_id: int, session: Session = Depends(db.get_session)) -> dict:
-    """Delete a list by ID from the database."""
+    """Delete list and its items from the database."""
     shopping_list = await get_list_by_id(list_id, session)
+    # delete permissions to list
+    perms = session.exec(select(UserListPermission).where(UserListPermission.list_id == list_id)).all()
+    for perm in perms:
+        session.delete(perm)
+    # delete child items
+    if shopping_list.items:
+        for item in shopping_list.items:
+            session.delete(item)
+    # delete list itself
     session.delete(shopping_list)
     session.commit()
     return {"detail": "List deleted successfully"}
+
+# Item operations
 
 async def get_items_from_list(list_id: int, session: Session = Depends(db.get_session)) -> list[ShoppingItem]:
     shoppinglist = await get_list_by_id(list_id, session)
     if not shoppinglist.items:
         return []
     return shoppinglist.items
+
+async def add_item(
+        list_id: int,
+        input_item: ShoppingItemCreate,
+        session: Session = Depends(db.get_session)
+) -> ShoppingItem:
+    parent_list = await get_list_by_id(list_id, session)
+    if not parent_list.items:
+        parent_list.items = []
+    ShoppingItemCreate.model_validate(input_item)
+    init_data = input_item.model_dump()
+    init_data.update({"parent_list_id" : parent_list.id})
+    new_item = ShoppingItem(**init_data)
+    parent_list.items.append
+    session.add(new_item)
+    session.commit()
+    session.refresh(new_item)
+    return new_item
