@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
-from models import ShoppingList, ShoppingListCreate
+from models import ShoppingList, ShoppingListCreate, ShoppingItem
 import service.shoppinglist
+import service.shoppingitem
 
 router = APIRouter(prefix="/shoppinglist")
+
+# Operations on whole lists
 
 @router.get("/")
 async def get_shopping_lists(
@@ -43,3 +46,19 @@ async def delete_shopping_list(
 ) -> dict:
     """Delete a shopping list by ID."""
     return deleting_result
+
+# Operations on list items
+
+@router.get("/{list_id}/items")
+async def get_items_from_list(
+    list_id: int,
+    result = Depends(service.shoppinglist.get_items_from_list)
+) -> list[ShoppingItem]:
+    return result
+
+@router.post("/{list_id}/items")
+async def add_item(
+    list_id: int,
+    new_item: ShoppingItem = Depends(service.shoppinglist.add_item)
+) -> ShoppingItem:
+    return new_item

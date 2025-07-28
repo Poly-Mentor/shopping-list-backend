@@ -1,12 +1,10 @@
 from fastapi import Depends, HTTPException
 from sqlmodel import Session, select
-from typing import Annotated
-from data import db
+
 from models import UserListPermission, User, ShoppingList
 from .user import get_user_by_id
 from .shoppinglist import get_list_by_id
-
-DBSessionDep = Annotated[Session, Depends(db.get_session)]
+from data.db import DBSessionDep
 
 async def user_has_access_to_list(user_id: int, list_id: int, session: DBSessionDep) -> bool:
     found_permission: UserListPermission | None = session.exec(

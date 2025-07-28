@@ -41,9 +41,15 @@ class ShoppingListCreate(BaseShoppingList):
 # SHOPPING ITEM
 ###########################################################
 
-class ShoppingItem(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+class BaseShoppingItem(SQLModel):
     name: str
     quantity: int | None = Field(default=None, gt=0)
     # category
+
+class ShoppingItem(BaseShoppingItem, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    parent_list_id: int = Field(foreign_key="shoppinglist.id")
     parent_list: ShoppingList = Relationship(back_populates="items")
+
+class ShoppingItemCreate(BaseShoppingItem):
+    pass

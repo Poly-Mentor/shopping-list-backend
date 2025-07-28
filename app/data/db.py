@@ -1,4 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session
+from fastapi import Depends
+from typing import Annotated
 
 DATABASE_URL = "sqlite:///shoppinglist.sqlite"
 engine = create_engine(DATABASE_URL, echo=True)
@@ -10,4 +12,4 @@ def get_session():
     with Session(engine) as session:
         yield session
 
-
+DBSessionDep = Annotated[Session, Depends(get_session)]
