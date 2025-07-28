@@ -32,6 +32,18 @@ class BaseShoppingList(SQLModel):
 class ShoppingList(BaseShoppingList, table=True):
     id: int | None = Field(default=None, primary_key=True)
     users: list[User] | None = Relationship(back_populates="lists", link_model=UserListPermission)
+    items: list["ShoppingItem"] | None = Relationship(back_populates="parent_list")
 
 class ShoppingListCreate(BaseShoppingList):
     pass
+
+###########################################################
+# SHOPPING ITEM
+###########################################################
+
+class ShoppingItem(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    quantity: int | None = Field(default=None, gt=0)
+    # category
+    parent_list: ShoppingList = Relationship(back_populates="items")
