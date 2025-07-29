@@ -1,7 +1,6 @@
 import pytest
 from fastapi import HTTPException
-from sqlmodel import Session
-from app.models import ShoppingList, ShoppingItem, ShoppingItemCreate
+from app.models import ShoppingList, ShoppingItem
 from app.service import shoppinglist as shoppinglist_service
 
 @pytest.mark.asyncio

@@ -1,7 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session
 from fastapi import Depends
 from typing import Annotated
-import os
 
 DATABASE_URL = "sqlite:///shoppinglist.sqlite"
 engine = create_engine(DATABASE_URL, echo=True)

@@ -1,5 +1,4 @@
 import pytest
-from sqlmodel import Session, select
 from app.models import User, ShoppingList, UserListPermission, ShoppingItem
 
 def test_user_model(session):

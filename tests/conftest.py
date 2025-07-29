@@ -2,8 +2,8 @@ import pytest
 import os
 from sqlmodel import SQLModel, create_engine, Session
 from fastapi.testclient import TestClient
-from app.data.db import get_session, set_test_engine
-from app.models import User, ShoppingList, UserListPermission, ShoppingItem
+from app.data.db import set_test_engine
+from app.models import User, ShoppingList, UserListPermission
 
 # Set the TESTING environment variable
 os.environ["TESTING"] = "1"

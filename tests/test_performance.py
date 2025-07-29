@@ -2,7 +2,7 @@ import pytest
 import time
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from app.models import User, ShoppingList, UserListPermission, ShoppingItem
+from app.models import ShoppingList, ShoppingItem
 
 @pytest.mark.asyncio
 async def test_create_many_items_performance(client: TestClient, session: Session):

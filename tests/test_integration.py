@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from app.models import User, ShoppingList, UserListPermission, ShoppingItem
+from app.models import UserListPermission, ShoppingItem
 
 @pytest.mark.asyncio
 async def test_full_user_workflow(client: TestClient, session: Session):

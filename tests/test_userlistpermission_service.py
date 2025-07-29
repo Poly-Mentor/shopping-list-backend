@@ -1,6 +1,5 @@
 import pytest
 from fastapi import HTTPException
-from sqlmodel import Session
 from app.models import User, ShoppingList, UserListPermission
 from app.service import userlistpermission as userlistpermission_service
 

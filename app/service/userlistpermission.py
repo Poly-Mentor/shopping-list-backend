@@ -36,10 +36,6 @@ async def grant_access_to_list(user_id: int, list_id: int, session: DBSessionDep
     return {"detail": "Access granted"}
 
 async def revoke_access_to_list(user_id: int, list_id: int, session: DBSessionDep) -> dict:
-    # permission_to_delete: UserListPermission | None = session.exec(
-    #     select(UserListPermission).where(
-    #         UserListPermission.user_id == user_id,
-    #         UserListPermission.list_id == list_id)).first()
     permission_to_delete = session.get(UserListPermission, (user_id, list_id))
     if not permission_to_delete:
         raise HTTPException(status_code=404, detail="Permission not found")
