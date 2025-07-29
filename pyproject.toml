@@ -9,3 +9,8 @@ dependencies = [
     "pytest-asyncio>=1.1.0",
     "sqlmodel>=0.0.24",
 ]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+]

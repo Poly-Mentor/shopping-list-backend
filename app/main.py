@@ -7,7 +7,10 @@ from app.routers import user, shoppinglist, userlistpermission
 
 from app.data import db
 
-if getenv("ENVIRONMENT") == "development":
+# TODO migrations (alembic?)
+
+# Load environment variables in development
+if getenv("ENVIRONMENT", "development") == "development":
     load_dotenv()
 
 @asynccontextmanager
@@ -28,8 +31,3 @@ app.include_router(userlistpermission.router)
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="localhost", port=8000, reload=getenv("ENVIRONMENT") == "development")

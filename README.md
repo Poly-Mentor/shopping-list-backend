@@ -1,6 +1,47 @@
+# Shopping List Backend
+
 Web application for shopping lists
 
 Project under development
+
+## Getting Started
+
+### Prerequisites
+- Python 3.12+
+- uv (for dependency management)
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies using uv:
+```bash
+uv sync
+```
+
+### Running the Application
+
+For development (with auto-reload):
+```bash
+uv run uvicorn app.main:app --host localhost --port 8000 --reload
+```
+
+For production:
+```bash
+uv run uvicorn app.main:app --host localhost --port 8000
+```
+
+You can also run it directly if uvicorn is installed globally:
+```bash
+# Development
+uvicorn app.main:app --host localhost --port 8000 --reload
+
+# Production
+uvicorn app.main:app --host localhost --port 8000
+```
+
+The API will be available at `http://localhost:8000`
+- API documentation: `http://localhost:8000/docs`
+- Alternative docs: `http://localhost:8000/redoc`
 
 ## Running Tests
 
