@@ -62,3 +62,20 @@ async def add_item(
     new_item: ShoppingItem = Depends(app.service.shoppinglist.add_item)
 ) -> ShoppingItem:
     return new_item
+
+# Operations on individual items
+
+@router.patch("/items/{item_id}")
+async def update_item(
+    item_id: int,
+    item_data: ShoppingItem,
+    updated_item: ShoppingItem = Depends(app.service.shoppingitem.update_item)
+) -> ShoppingItem:
+    return updated_item
+
+@router.delete("/items/{item_id}")
+async def delete_item(
+    item_id: int,
+    result: dict = Depends(app.service.shoppingitem.delete_item)
+) -> dict:
+    return result
