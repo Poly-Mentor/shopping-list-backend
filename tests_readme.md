@@ -26,12 +26,19 @@ Testing FastAPI applications with SQLModel requires careful consideration of dat
 ### File Structure
 ```
 tests/
-├── conftest.py              # Test configuration and fixtures
-├── test_main.py            # Main app endpoint tests
-├── test_models.py          # Database model tests
-├── test_*_service.py       # Service layer tests (direct function calls)
-├── test_*_router.py        # Router tests (HTTP requests via TestClient)
-└── tests_readme.md         # This documentation
+├── conftest.py                    # Test configuration and fixtures
+├── test_main.py                  # Main app endpoint tests
+├── test_models.py                # Database model tests
+├── test_*_service.py             # Service layer tests (direct function calls)
+├── test_*_router.py              # Router tests (HTTP requests via TestClient)
+├── test_security.py              # Security and permission tests
+├── test_integration.py           # Integration tests spanning multiple components
+├── test_edge_cases.py            # Edge case and data validation tests
+├── test_performance.py           # Performance tests
+├── test_error_handling.py        # Error handling tests
+├── test_shoppingitem_service.py  # ShoppingItem service tests
+├── test_shoppingitem_router.py   # ShoppingItem router tests
+└── tests_readme.md               # This documentation
 ```
 
 ## Common Pitfalls
@@ -258,6 +265,70 @@ async def test_get_user_by_id(client: TestClient, session: Session):
     user_data = response.json()
     assert user_data["id"] == user.id
     assert user_data["name"] == user.name
+```
+
+### 4. Security/Permission Tests
+Test access control and permissions:
+```python
+async def test_user_cannot_access_items_from_non_permitted_list(client: TestClient, session: Session):
+    # Setup users, lists, permissions
+    # ...
+
+    # Test that user2 cannot access items from a list they don't have permission to access
+    # ...
+```
+
+### 5. Integration Tests
+Test workflows that span multiple components:
+```python
+async def test_full_user_workflow(client: TestClient, session: Session):
+    """Test a full workflow: create user, create list, add items, retrieve everything."""
+    # Create a user
+    # Create a shopping list
+    # Grant user access to the list
+    # Add items to the list
+    # Retrieve the list with items
+    # Retrieve items from the list
+    # Retrieve user lists
+```
+
+### 6. Edge Case Tests
+Test data validation and edge cases:
+```python
+async def test_create_item_with_zero_quantity(client: TestClient, session: Session):
+    """Test creating an item with zero quantity (should fail validation)."""
+    # Create a shopping list
+    # Test creating an item with zero quantity
+    # Assert that it fails validation with 422 status code
+```
+
+### 7. Performance Tests
+Test application performance under load:
+```python
+async def test_create_many_items_performance(client: TestClient, session: Session):
+    """Test the performance of creating many items in a list."""
+    # Create a shopping list
+    # Create many items and measure time
+    # Assert that it completes within acceptable time limits
+```
+
+### 8. Error Handling Tests
+Test how the application handles various error conditions:
+```python
+async def test_create_item_with_invalid_list_id(client: TestClient, session: Session):
+    """Test creating an item with an invalid list ID."""
+    # Test creating an item with a non-existent list ID
+    # Assert that it fails with a 404 status code
+```
+
+### 9. ShoppingItem Tests
+Test ShoppingItem-specific functionality including CRUD operations:
+```python
+async def test_update_item(client: TestClient, session: Session):
+    """Test updating a shopping item."""
+    # Create a shopping list and item
+    # Test updating the item
+    # Assert that the item was updated correctly
 ```
 
 ## Troubleshooting
