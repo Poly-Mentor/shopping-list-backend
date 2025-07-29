@@ -117,10 +117,9 @@ def test_something():
 def engine_fixture():
     engine = create_engine("sqlite:///:memory:", echo=True, 
                           connect_args={"check_same_thread": False})
-    set_test_engine(engine)  # ✅ Configure app to use test engine
+    # Create all tables
     SQLModel.metadata.create_all(engine)
     yield engine
-    set_test_engine(None)  # ✅ Clean up
 ```
 
 ## Best Practices
@@ -178,16 +177,10 @@ def engine_fixture():
         connect_args={"check_same_thread": False}  # Allow multi-threading
     )
     
-    # Configure app to use test engine
-    set_test_engine(engine)
-    
     # Create all tables
     SQLModel.metadata.create_all(engine)
     
     yield engine
-    
-    # Cleanup
-    set_test_engine(None)
 ```
 
 ### 5. Dependency Override Pattern
@@ -341,16 +334,14 @@ sqlite3.OperationalError: no such table: user
 ```
 
 **Causes:**
-1. Test engine not properly set
-2. Tables not created for test engine
-3. Session isolation issues
-4. Using production app instead of test app
+1. Tables not created for test engine
+2. Session isolation issues
+3. Using production app instead of test app
 
 **Solutions:**
-1. Ensure `set_test_engine(engine)` is called
-2. Call `SQLModel.metadata.create_all(engine)` after engine creation
-3. Use shared session between fixtures
-4. Use client fixture, not module-level TestClient
+1. Call `SQLModel.metadata.create_all(engine)` after engine creation
+2. Use shared session between fixtures
+3. Use client fixture, not module-level TestClient
 
 ### Session Conflicts
 

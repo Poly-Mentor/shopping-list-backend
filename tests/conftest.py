@@ -2,8 +2,8 @@ import pytest
 import os
 from sqlmodel import SQLModel, create_engine, Session
 from fastapi.testclient import TestClient
-from app.data.db import set_test_engine
 from app.models import User, ShoppingList, UserListPermission
+from app.data import db
 
 # Set the TESTING environment variable
 os.environ["TESTING"] = "1"
@@ -14,14 +14,9 @@ def engine_fixture():
     # Use an in-memory SQLite database for testing
     # Add check_same_thread=False to allow usage across threads
     engine = create_engine("sqlite:///:memory:", echo=True, connect_args={"check_same_thread": False})
-    # Set the test engine for the app
-    set_test_engine(engine)
     # Create all tables for the test engine
-    from sqlmodel import SQLModel
     SQLModel.metadata.create_all(engine)
     yield engine
-    # Reset the test engine
-    set_test_engine(None)
 
 @pytest.fixture(name="session", scope="function")
 def session_fixture(engine):
