@@ -16,11 +16,14 @@ class BaseUser(SQLModel):
     name: str
 
 class User(BaseUser, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True, index=True)
+    name: str = Field(unique=True)
     lists: list["ShoppingList"] | None = Relationship(back_populates="users", link_model=UserListPermission)
+    hashed_password: str
     # owned_lists: list["ShoppingList"] = Relationship(back_populates="owner")
 
 class UserCreate(BaseUser):
+    password: str
     pass
 
 ###########################################################
@@ -56,3 +59,14 @@ class ShoppingItem(BaseShoppingItem, table=True):
 
 class ShoppingItemCreate(BaseShoppingItem):
     pass
+
+###########################################################
+# TOKENS
+###########################################################
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+class TokenData(SQLModel):
+    username: str

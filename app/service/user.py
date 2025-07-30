@@ -1,8 +1,10 @@
 from app.models import User, UserCreate, ShoppingList
 from app.data import db
 from sqlmodel import Session, select
+from typing import Annotated
 from fastapi import Depends, HTTPException
-
+from fastapi.security import OAuth2PasswordRequestForm
+from app.service.auth import hash_password_dep
 
 async def get_all_users(session: Session = Depends(db.get_session)) -> list[User]:
     """Fetch all users from the database."""
@@ -19,9 +21,28 @@ async def get_user_by_id(user_id: int, session: Session = Depends(db.get_session
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-async def create_user(new_user_data: UserCreate, session: Session = Depends(db.get_session)) -> User:
+async def get_user_by_name(username: str, session: Session = Depends(db.get_session)) -> User:
+    user = session.exec(select(User).where(User.name == username)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+async def get_user_from_login(
+    form_data: OAuth2PasswordRequestForm,
+    session: Session = Depends(db.get_session)
+) -> User | None:
+    user = session.exec(select(User).where(User.name == form_data.username)).first()
+    return user
+
+get_user_from_login_dep = Annotated[User|None, Depends(get_user_from_login)]
+
+async def create_user(
+        new_user_data: UserCreate,
+        hashed_password: hash_password_dep,
+        session: Session = Depends(db.get_session)
+) -> User:
     """Create a new user in the database."""
-    new_user = User(name=new_user_data.name)
+    new_user = User(name=new_user_data.name, hashed_password=hashed_password)
     session.add(new_user)
     session.commit()
     session.refresh(new_user)

@@ -1,17 +1,18 @@
 from os import getenv
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
+
+# Load environment variables - find_dotenv automatically searches for .env file
+load_dotenv(find_dotenv(), verbose=True)
 
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.routers import user, shoppinglist, userlistpermission
+from app.routers import auth, user, shoppinglist, userlistpermission
 
 from app.data import db
 
 # TODO migrations (alembic?)
 
-# Load environment variables in development
-if getenv("ENVIRONMENT", "development") == "development":
-    load_dotenv()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,6 +28,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(user.router)
 app.include_router(shoppinglist.router)
 app.include_router(userlistpermission.router)
+app.include_router(auth.router)
 
 @app.get("/")
 async def root():
