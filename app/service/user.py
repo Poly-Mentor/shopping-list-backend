@@ -1,10 +1,13 @@
+import jwt
+from fastapi import Depends, HTTPException, status
 from app.models import User, UserCreate, ShoppingList
 from app.data import db
 from sqlmodel import Session, select
 from typing import Annotated
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from app.service.auth import hash_password_dep
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from app.service.auth import hash_password_dep, decode_token, oauth2_scheme, SECRET_KEY, ALGORITHM, verify_password
+
+oauth2_pwd_scheme = oauth2_scheme
 
 async def get_all_users(session: Session = Depends(db.get_session)) -> list[User]:
     """Fetch all users from the database."""
@@ -28,10 +31,30 @@ async def get_user_by_name(username: str, session: Session = Depends(db.get_sess
     return user
 
 async def get_user_from_login(
-    form_data: OAuth2PasswordRequestForm,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     session: Session = Depends(db.get_session)
 ) -> User | None:
     user = session.exec(select(User).where(User.name == form_data.username)).first()
+    if user and verify_password(form_data.password, user.hashed_password):
+        return user
+    return None
+
+async def get_current_user(
+    token: str = Depends(oauth2_pwd_scheme),
+    session: Session = Depends(db.get_session)
+) -> User:
+    # Decode token directly without using the dependency function
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    user = session.exec(select(User).where(User.name == username)).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
 
 async def create_user(

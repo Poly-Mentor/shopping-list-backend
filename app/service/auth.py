@@ -6,9 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
-from sqlmodel import select
-from app.models import User, UserCreate, Token, TokenData
-from app.data.db import DBSessionDep
+from app.models import User, UserCreate
 
 # Load environment variables
 from dotenv import load_dotenv, find_dotenv
@@ -38,14 +36,13 @@ TOKEN_EXPIRES_MINUTES = get_token_expires_minutes()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/auth")
 
 oauth2_scheme_dep = Annotated[str, Depends(oauth2_scheme)]
 oauth2_form_dep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
 
 def hash_string_password(password: str) -> str:
     return pwd_context.hash(password)

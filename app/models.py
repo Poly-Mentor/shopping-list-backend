@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship
 
 ###########################################################
@@ -64,9 +65,9 @@ class ShoppingItemCreate(BaseShoppingItem):
 # TOKENS
 ###########################################################
 
-class Token(SQLModel):
+class Token(BaseModel):
     access_token: str
     token_type: str
 
-class TokenData(SQLModel):
+class TokenData(BaseModel):
     username: str
