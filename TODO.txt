@@ -1,4 +1,5 @@
-service: auth user by token
+update tests
+list ownership
 UserShow schema
 migrations (alembic?)
 Dockerize

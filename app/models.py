@@ -27,6 +27,12 @@ class UserCreate(BaseUser):
     password: str
     pass
 
+class UserShow(BaseModel):
+    id: int
+    name: str
+    lists: list["ShoppingList"] | None
+
+
 ###########################################################
 # SHOPPING LIST
 ###########################################################

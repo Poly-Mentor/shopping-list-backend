@@ -36,7 +36,7 @@ TOKEN_EXPIRES_MINUTES = get_token_expires_minutes()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/auth")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 oauth2_scheme_dep = Annotated[str, Depends(oauth2_scheme)]
 oauth2_form_dep = Annotated[OAuth2PasswordRequestForm, Depends()]
