@@ -20,7 +20,7 @@ async def get_user_lists(user_id : int, users_lists: list[ShoppingList] = Depend
     return users_lists
 
 @router.post("/")
-async def create_user(new_user_data: UserCreate, newUser : User = Depends(app.service.user.create_user)) -> User:
+async def create_user(user: UserCreate, newUser : User = Depends(app.service.user.create_user)) -> User:
     """Create a new user."""
     return newUser
 

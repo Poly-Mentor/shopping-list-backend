@@ -60,7 +60,7 @@ async def test_get_user_by_id_not_found(client: TestClient):
 async def test_create_user(client: TestClient, session: Session):
     """Test creating a new user."""
     # Test creating a user
-    user_data = {"name": "New User"}
+    user_data = {"name": "New User", "password": "secure_password"}
     response = client.post("/user/", json=user_data)
     assert response.status_code == 200
     created_user = response.json()

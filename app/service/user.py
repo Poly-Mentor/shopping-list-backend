@@ -34,15 +34,13 @@ async def get_user_from_login(
     user = session.exec(select(User).where(User.name == form_data.username)).first()
     return user
 
-get_user_from_login_dep = Annotated[User|None, Depends(get_user_from_login)]
-
 async def create_user(
-        new_user_data: UserCreate,
+        user: UserCreate,
         hashed_password: hash_password_dep,
         session: Session = Depends(db.get_session)
 ) -> User:
     """Create a new user in the database."""
-    new_user = User(name=new_user_data.name, hashed_password=hashed_password)
+    new_user = User(name=user.name, hashed_password=hashed_password)
     session.add(new_user)
     session.commit()
     session.refresh(new_user)

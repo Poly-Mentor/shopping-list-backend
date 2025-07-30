@@ -1,3 +1,4 @@
-authentication
+service: auth user by token
+UserShow schema
 migrations (alembic?)
 Dockerize
