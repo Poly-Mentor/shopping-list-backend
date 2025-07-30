@@ -7,8 +7,8 @@ from app.models import User, ShoppingList, UserListPermission
 async def test_get_users(client: TestClient, session: Session):
     """Test getting all users."""
     # Create test users
-    user1 = User(name="User 1")
-    user2 = User(name="User 2")
+    user1 = User(name="User 1", hashed_password="hashed_password_1")
+    user2 = User(name="User 2", hashed_password="hashed_password_2")
     session.add(user1)
     session.add(user2)
     session.commit()
@@ -33,7 +33,7 @@ async def test_get_users_empty(client: TestClient, session: Session):
 async def test_get_user_by_id(client: TestClient, session: Session):
     """Test getting a user by ID."""
     # Create a test user
-    user = User(name="Test User")
+    user = User(name="Test User", hashed_password="hashed_test_password")
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -76,7 +76,7 @@ async def test_create_user(client: TestClient, session: Session):
 async def test_update_user(client: TestClient, session: Session):
     """Test updating a user."""
     # Create a test user
-    user = User(name="Original Name")
+    user = User(name="Original Name", hashed_password="hashed_original_password")
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -110,7 +110,7 @@ async def test_update_user_not_found(client: TestClient):
 async def test_delete_user(client: TestClient, session: Session):
     """Test deleting a user."""
     # Create a test user
-    user = User(name="User to Delete")
+    user = User(name="User to Delete", hashed_password="hashed_delete_password")
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -140,7 +140,7 @@ async def test_delete_user_not_found(client: TestClient):
 async def test_get_user_lists(client: TestClient, session: Session):
     """Test getting lists for a user."""
     # Create a user and shopping lists
-    user = User(name="Test User")
+    user = User(name="Test User", hashed_password="hashed_list_password")
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -182,7 +182,7 @@ async def test_get_user_lists(client: TestClient, session: Session):
 async def test_get_user_lists_empty(client: TestClient, session: Session):
     """Test getting lists for a user when they have no lists."""
     # Create a user with no lists
-    user = User(name="Test User")
+    user = User(name="Test User", hashed_password="hashed_empty_list_password")
     session.add(user)
     session.commit()
     session.refresh(user)
