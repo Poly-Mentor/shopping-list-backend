@@ -4,6 +4,7 @@ from sqlmodel import SQLModel, create_engine, Session
 from fastapi.testclient import TestClient
 from app.models import User, ShoppingList, UserListPermission
 from app.data import db
+from app.service.auth import hash_string_password
 
 # Set the TESTING environment variable
 os.environ["TESTING"] = "1"
@@ -61,7 +62,8 @@ def client_fixture(engine, session):
 
 @pytest.fixture(name="sample_user")
 def sample_user_fixture(session):
-    user = User(name="Test User")
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)

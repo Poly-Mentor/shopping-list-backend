@@ -4,7 +4,9 @@ from app.models import User, ShoppingList, UserListPermission, ShoppingItem
 def test_user_model(session):
     """Test User model creation and persistence."""
     # Create a user
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -38,7 +40,9 @@ def test_shopping_list_model(session):
 def test_user_list_permission_model(session):
     """Test UserListPermission model creation and persistence."""
     # First create a user and a shopping list
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -96,7 +100,9 @@ def test_shopping_item_model(session):
 def test_user_shopping_list_relationship(session):
     """Test the many-to-many relationship between User and ShoppingList."""
     # Create a user and a shopping list
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)

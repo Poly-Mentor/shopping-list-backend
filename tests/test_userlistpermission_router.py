@@ -7,7 +7,9 @@ from app.models import User, ShoppingList, UserListPermission
 async def test_check_user_list_permission(client: TestClient, session: Session):
     """Test checking if a user has access to a list."""
     # Create a user and a shopping list
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)
@@ -34,7 +36,9 @@ async def test_check_user_list_permission(client: TestClient, session: Session):
 async def test_check_user_list_permission_no_permission(client: TestClient, session: Session):
     """Test checking if a user has access to a list when they don't have permission."""
     # Create a user and a shopping list without linking them
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)
@@ -56,7 +60,9 @@ async def test_check_user_list_permission_no_permission(client: TestClient, sess
 async def test_grant_user_list_permission(client: TestClient, session: Session):
     """Test granting access to a list."""
     # Create a user and a shopping list
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)
@@ -101,7 +107,9 @@ async def test_grant_user_list_permission_user_not_found(client: TestClient, ses
 async def test_grant_user_list_permission_list_not_found(client: TestClient, session: Session):
     """Test granting access to a list when the list doesn't exist."""
     # Create a user
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -118,7 +126,9 @@ async def test_grant_user_list_permission_list_not_found(client: TestClient, ses
 async def test_revoke_user_list_permission(client: TestClient, session: Session):
     """Test revoking access to a list."""
     # Create a user and a shopping list
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)
@@ -149,7 +159,9 @@ async def test_revoke_user_list_permission(client: TestClient, session: Session)
 async def test_revoke_user_list_permission_not_found(client: TestClient, session: Session):
     """Test revoking access to a list when the permission doesn't exist."""
     # Create a user and a shopping list without linking them
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)

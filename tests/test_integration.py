@@ -7,7 +7,7 @@ from app.models import UserListPermission, ShoppingItem
 async def test_full_user_workflow(client: TestClient, session: Session):
     """Test a full workflow: create user, create list, add items, retrieve everything."""
     # Create a user
-    user_data = {"name": "Integration Test User"}
+    user_data = {"name": "Integration Test User", "password": "testpassword"}
     response = client.post("/user/", json=user_data)
     assert response.status_code == 200
     user = response.json()
@@ -73,7 +73,7 @@ async def test_full_user_workflow(client: TestClient, session: Session):
 async def test_cascade_delete_workflow(client: TestClient, session: Session):
     """Test that deleting a list cascades to its items and permissions."""
     # Create a user
-    user_data = {"name": "Cascade Test User"}
+    user_data = {"name": "Cascade Test User", "password": "testpassword"}
     response = client.post("/user/", json=user_data)
     assert response.status_code == 200
     user = response.json()

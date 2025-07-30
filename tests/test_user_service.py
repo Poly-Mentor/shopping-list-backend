@@ -7,8 +7,10 @@ from app.service import user as user_service
 async def test_get_all_users(session):
     """Test getting all users when users exist."""
     # Create test users
-    user1 = User(name="User 1")
-    user2 = User(name="User 2")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user1 = User(name="User 1", hashed_password=hashed_password)
+    user2 = User(name="User 2", hashed_password=hashed_password)
     session.add(user1)
     session.add(user2)
     session.commit()
@@ -33,7 +35,9 @@ async def test_get_all_users_empty(session):
 async def test_get_user_by_id(session):
     """Test getting a user by ID."""
     # Create a test user
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -60,10 +64,14 @@ async def test_get_user_by_id_not_found(session):
 async def test_create_user(session):
     """Test creating a new user."""
     # Create a user creation object
-    user_create = UserCreate(name="New User")
+    user_create = UserCreate(name="New User", password="testpassword")
+    
+    # Mock the hashed_password dependency
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
     
     # Test creating a user
-    created_user = await user_service.create_user(user_create, session)
+    created_user = await user_service.create_user(user_create, hashed_password, session)
     
     # Verify the user was created correctly
     assert created_user.id is not None
@@ -78,7 +86,9 @@ async def test_create_user(session):
 async def test_delete_user(session):
     """Test deleting a user."""
     # Create a test user
-    user = User(name="User to Delete")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="User to Delete", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -110,7 +120,9 @@ async def test_delete_user_not_found(session):
 async def test_update_user(session):
     """Test updating a user."""
     # Create a test user
-    user = User(name="Original Name")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Original Name", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -119,7 +131,7 @@ async def test_update_user(session):
     assert user.id is not None
     
     # Test updating the user
-    user_update = UserCreate(name="Updated Name")
+    user_update = UserCreate(name="Updated Name", password="newpassword")
     updated_user = await user_service.update_user(user.id, user_update, session)
     
     # Verify the user was updated correctly
@@ -135,7 +147,7 @@ async def test_update_user(session):
 async def test_update_user_not_found(session):
     """Test updating a user that doesn't exist."""
     # Test updating a user that doesn't exist
-    user_update = UserCreate(name="Updated Name")
+    user_update = UserCreate(name="Updated Name", password="newpassword")
     with pytest.raises(HTTPException) as exc_info:
         await user_service.update_user(999, user_update, session)
     
@@ -146,7 +158,9 @@ async def test_update_user_not_found(session):
 async def test_get_user_lists(session):
     """Test getting lists for a user."""
     # Create a user and shopping lists
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -187,7 +201,9 @@ async def test_get_user_lists(session):
 async def test_get_user_lists_empty(session):
     """Test getting lists for a user when they have no lists."""
     # Create a user with no lists
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     session.add(user)
     session.commit()
     session.refresh(user)

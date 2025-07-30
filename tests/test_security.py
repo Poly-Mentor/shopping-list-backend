@@ -7,7 +7,9 @@ from app.models import User, ShoppingList, UserListPermission, ShoppingItem
 async def test_user_can_access_items_from_permitted_list(client: TestClient, session: Session):
     """Test that a user can access items from a list they have permission to access."""
     # Create a user and a shopping list
-    user = User(name="Test User")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user)
     session.add(shopping_list)
@@ -41,8 +43,10 @@ async def test_user_can_access_items_from_permitted_list(client: TestClient, ses
 async def test_user_cannot_access_items_from_non_permitted_list(client: TestClient, session: Session):
     """Test that a user cannot access items from a list they don't have permission to access."""
     # Create two users
-    user1 = User(name="User 1")
-    user2 = User(name="User 2")
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user1 = User(name="User 1", hashed_password=hashed_password)
+    user2 = User(name="User 2", hashed_password=hashed_password)
     shopping_list = ShoppingList(name="Test List")
     session.add(user1)
     session.add(user2)

@@ -85,7 +85,7 @@ async def test_update_user(client: TestClient, session: Session):
     assert user.id is not None
     
     # Test updating the user
-    updated_data = {"name": "Updated Name"}
+    updated_data = {"name": "Updated Name", "password": "new_secure_password"}
     response = client.patch(f"/user/{user.id}", json=updated_data)
     assert response.status_code == 200
     updated_user = response.json()
@@ -101,7 +101,7 @@ async def test_update_user(client: TestClient, session: Session):
 async def test_update_user_not_found(client: TestClient):
     """Test updating a user that doesn't exist."""
     # Test updating a user that doesn't exist
-    updated_data = {"name": "Updated Name"}
+    updated_data = {"name": "Updated Name", "password": "new_secure_password"}
     response = client.patch("/user/999", json=updated_data)
     assert response.status_code == 404
     assert response.json()["detail"] == "User not found"
