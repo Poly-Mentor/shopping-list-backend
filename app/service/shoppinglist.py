@@ -1,23 +1,23 @@
 from app.models import *
 from app.data import db
-from sqlmodel import Session, select
-from fastapi import Depends, HTTPException
+from sqlmodel import select
+from fastapi import HTTPException
 
-async def get_all_lists(session: Session = Depends(db.get_session)) -> list[ShoppingList]:
+async def get_all_lists(session: db.DBSessionDep) -> list[ShoppingList]:
     """Fetch all lists from the database."""
     lists: list[ShoppingList] = list(session.exec(select(ShoppingList)).all())
     if not lists:
         raise HTTPException(status_code=404, detail="No lists found")
     return lists
 
-async def get_list_by_id(list_id: int, session: Session = Depends(db.get_session)) -> ShoppingList:
+async def get_list_by_id(list_id: int, session: db.DBSessionDep) -> ShoppingList:
     """Fetch a list by ID from the database."""
     shopping_list = session.get(ShoppingList, list_id)
     if not shopping_list:
         raise HTTPException(status_code=404, detail="List not found")
     return shopping_list
 
-async def create_list(new_list_data: BaseShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
+async def create_list(new_list_data: BaseShoppingList, session: db.DBSessionDep) -> ShoppingList:
     """Create a new list in the database."""
     new_list = ShoppingList(name=new_list_data.name)
     session.add(new_list)
@@ -25,7 +25,7 @@ async def create_list(new_list_data: BaseShoppingList, session: Session = Depend
     session.refresh(new_list)
     return new_list
 
-async def update_list(list_id: int, new_list_data: ShoppingList, session: Session = Depends(db.get_session)) -> ShoppingList:
+async def update_list(list_id: int, new_list_data: ShoppingList, session: db.DBSessionDep) -> ShoppingList:
     """Update existing list in the database."""
     existing_list = await get_list_by_id(list_id, session)
     if new_list_data.name is not None:
@@ -36,7 +36,7 @@ async def update_list(list_id: int, new_list_data: ShoppingList, session: Sessio
     return existing_list
     
 
-async def delete_list(list_id: int, session: Session = Depends(db.get_session)) -> dict:
+async def delete_list(list_id: int, session: db.DBSessionDep) -> dict:
     """Delete list and its items from the database."""
     shopping_list = await get_list_by_id(list_id, session)
     # permissions and child items are deleted automatically (ondelete="CASCADE")
@@ -46,7 +46,7 @@ async def delete_list(list_id: int, session: Session = Depends(db.get_session)) 
 
 # Item operations
 
-async def get_items_from_list(list_id: int, session: Session = Depends(db.get_session)) -> list[ShoppingItem]:
+async def get_items_from_list(list_id: int, session: db.DBSessionDep) -> list[ShoppingItem]:
     shoppinglist = await get_list_by_id(list_id, session)
     if not shoppinglist.items:
         return []
@@ -55,7 +55,7 @@ async def get_items_from_list(list_id: int, session: Session = Depends(db.get_se
 async def add_item(
         list_id: int,
         input_item: ShoppingItemCreate,
-        session: Session = Depends(db.get_session)
+        session: db.DBSessionDep
 ) -> ShoppingItem:
     parent_list = await get_list_by_id(list_id, session)
     if not parent_list.items:
