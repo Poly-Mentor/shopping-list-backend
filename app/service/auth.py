@@ -2,9 +2,8 @@ import jwt
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from app.models import User, UserCreate
 
@@ -63,18 +62,3 @@ def create_access_token(user: User):
     encoded_jwt = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-
-def decode_token(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except InvalidTokenError:
-        raise credentials_exception
-    return username
