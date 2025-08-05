@@ -13,7 +13,7 @@ async def login_for_access_token(
     form_data: app.service.auth.oauth2_form_dep,
     session: Session = Depends(get_session)
 ) -> Token:
-    user = await app.service.user.get_user_from_login(form_data, session)
+    user = await app.service.user.get_user_from_login(session, form_data)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     

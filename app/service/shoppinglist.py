@@ -2,6 +2,7 @@ from app.models import *
 from app.data import db
 from sqlmodel import select
 from fastapi import HTTPException
+from app.service.user import CurrentUserDep
 
 async def get_all_lists(session: db.DBSessionDep) -> list[ShoppingList]:
     """Fetch all lists from the database."""
@@ -17,9 +18,9 @@ async def get_list_by_id(list_id: int, session: db.DBSessionDep) -> ShoppingList
         raise HTTPException(status_code=404, detail="List not found")
     return shopping_list
 
-async def create_list(new_list_data: BaseShoppingList, session: db.DBSessionDep) -> ShoppingList:
+async def create_list(new_list_data: BaseShoppingList, user: User , session: db.DBSessionDep) -> ShoppingList:
     """Create a new list in the database."""
-    new_list = ShoppingList(name=new_list_data.name)
+    new_list = ShoppingList(name=new_list_data.name, owner_id=user.id)
     session.add(new_list)
     session.commit()
     session.refresh(new_list)

@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends
-from app.models import ShoppingList, ShoppingListCreate, ShoppingItem
+from app.models import ShoppingList, ShoppingListCreate, ShoppingItem, User
+from app.data.db import DBSessionDep
 import app.service.shoppinglist
 import app.service.shoppingitem
+
+from app.service.user import get_current_user
 
 router = APIRouter(prefix="/shoppinglist")
 
@@ -24,11 +27,12 @@ async def get_shopping_list_by_id(
 
 @router.post("/")
 async def create_shopping_list(
+    session: DBSessionDep,
     new_list_data: ShoppingListCreate, 
-    new_shopping_list: ShoppingList = Depends(app.service.shoppinglist.create_list)
+    user: User = Depends(get_current_user),
 ) -> ShoppingList:
     """Create a new shopping list."""
-    return new_shopping_list
+    return await app.service.shoppinglist.create_list(new_list_data, user, session)
 
 @router.patch("/{list_id}")
 async def update_shopping_list(

@@ -3,6 +3,8 @@ from fastapi import Depends, HTTPException, status
 from app.models import User, UserCreate, ShoppingList
 from app.data import db
 from sqlmodel import select
+from typing import Annotated
+
 from fastapi.security import OAuth2PasswordRequestForm
 from app.service.auth import hash_password_dep, oauth2_scheme, SECRET_KEY, ALGORITHM, verify_password
 
@@ -54,6 +56,8 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
+
+CurrentUserDep = Annotated[User, get_current_user]
 
 async def create_user(
         user: UserCreate,

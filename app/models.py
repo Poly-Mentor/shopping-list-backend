@@ -17,11 +17,11 @@ class BaseUser(SQLModel):
     name: str
 
 class User(BaseUser, table=True):
-    id: int | None = Field(default=None, primary_key=True, index=True)
+    id: int = Field(default=None, primary_key=True, index=True)
     name: str = Field(unique=True)
     lists: list["ShoppingList"] | None = Relationship(back_populates="users", link_model=UserListPermission)
     hashed_password: str
-    # owned_lists: list["ShoppingList"] = Relationship(back_populates="owner")
+    owned_lists: list["ShoppingList"] = Relationship(back_populates="owner")
 
 class UserCreate(BaseUser):
     password: str
@@ -44,8 +44,8 @@ class ShoppingList(BaseShoppingList, table=True):
     id: int | None = Field(default=None, primary_key=True)
     users: list[User] | None = Relationship(back_populates="lists", link_model=UserListPermission)
     items: list["ShoppingItem"] | None = Relationship(back_populates="parent_list", cascade_delete=True)
-    # owner_id: int = Field(foreign_key="user.id")
-    # owner: User = Relationship(back_populates="owned_lists")
+    owner_id: int = Field(foreign_key="user.id")
+    owner: User = Relationship(back_populates="owned_lists")
 
 class ShoppingListCreate(BaseShoppingList):
     pass
