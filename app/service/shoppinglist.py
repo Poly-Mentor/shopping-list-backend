@@ -1,7 +1,7 @@
 from app.models import *
 from app.data import db
 from sqlmodel import select
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from app.service.user import CurrentUserDep
 
 async def get_all_lists(session: db.DBSessionDep) -> list[ShoppingList]:
@@ -20,26 +20,33 @@ async def get_list_by_id(list_id: int, session: db.DBSessionDep) -> ShoppingList
 
 async def create_list(new_list_data: BaseShoppingList, user: User , session: db.DBSessionDep) -> ShoppingList:
     """Create a new list in the database."""
+    # list limit can be later added here
     new_list = ShoppingList(name=new_list_data.name, owner_id=user.id)
     session.add(new_list)
     session.commit()
     session.refresh(new_list)
     return new_list
 
-async def update_list(list_id: int, new_list_data: ShoppingList, session: db.DBSessionDep) -> ShoppingList:
+async def update_list(list_id: int, new_list_data: ShoppingListCreate, user: User, session: db.DBSessionDep) -> ShoppingList:
     """Update existing list in the database."""
     existing_list = await get_list_by_id(list_id, session)
-    if new_list_data.name is not None:
-        existing_list.name = new_list_data.name
+    if new_list_data.name is None:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="List name can't be empty")
+    if existing_list.owner != user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="you must own the list to be able to modify it")
+    
+    existing_list.name = new_list_data.name
     session.add(existing_list)
     session.commit()
     session.refresh(existing_list)
     return existing_list
     
 
-async def delete_list(list_id: int, session: db.DBSessionDep) -> dict:
+async def delete_list(list_id: int, user: User, session: db.DBSessionDep) -> dict:
     """Delete list and its items from the database."""
     shopping_list = await get_list_by_id(list_id, session)
+    if shopping_list.owner != user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="you must own the list to be able to delete it")
     # permissions and child items are deleted automatically (ondelete="CASCADE")
     session.delete(shopping_list)
     session.commit()

@@ -16,6 +16,7 @@ async def get_shopping_lists(
 ) -> list[ShoppingList]:
     """Fetch all shopping lists."""
     return shopping_lists
+    
 
 @router.get("/{list_id}")
 async def get_shopping_list_by_id(
@@ -29,7 +30,7 @@ async def get_shopping_list_by_id(
 async def create_shopping_list(
     session: DBSessionDep,
     new_list_data: ShoppingListCreate, 
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user)
 ) -> ShoppingList:
     """Create a new shopping list."""
     return await app.service.shoppinglist.create_list(new_list_data, user, session)
@@ -38,17 +39,21 @@ async def create_shopping_list(
 async def update_shopping_list(
     list_id : int,
     new_list_data: ShoppingListCreate,
-    updated_list: ShoppingList = Depends(app.service.shoppinglist.update_list)
+    session: DBSessionDep,
+    user: User = Depends(get_current_user)
 ) -> ShoppingList:
     """Update existing shopping list."""
+    updated_list = await app.service.shoppinglist.update_list(list_id=list_id, new_list_data=new_list_data, user=user, session=session)
     return updated_list
 
 @router.delete("/{list_id}")
 async def delete_shopping_list(
     list_id: int,
-    deleting_result: dict = Depends(app.service.shoppinglist.delete_list)
+    session: DBSessionDep,
+    user: User = Depends(get_current_user)
 ) -> dict:
     """Delete a shopping list by ID."""
+    deleting_result: dict = await app.service.shoppinglist.delete_list(list_id=list_id, user=user, session=session)
     return deleting_result
 
 # Operations on list items

@@ -25,7 +25,7 @@ async def get_user_lists(user_id : int, users_lists: list[ShoppingList] = Depend
     """Fetch a list of shopping lists to which user of given ID has access to."""
     return users_lists
 
-@router.post("/")
+@router.post("/", response_model=UserShow)
 async def create_user(user: UserCreate, newUser : User = Depends(app.service.user.create_user)) -> User:
     """Create a new user."""
     return newUser
