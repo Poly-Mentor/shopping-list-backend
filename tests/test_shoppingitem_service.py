@@ -1,14 +1,21 @@
 import pytest
 from fastapi import HTTPException
 from sqlmodel import Session
-from app.models import ShoppingList, ShoppingItem
+from app.models import ShoppingList, ShoppingItem, User
 from app.service import shoppingitem as shoppingitem_service
 
 @pytest.mark.asyncio
 async def test_get_item_by_id(session):
     """Test getting a shopping item by ID."""
-    # Create a shopping list
-    shopping_list = ShoppingList(name="Test List")
+    # Create a user and shopping list
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(shopping_list)

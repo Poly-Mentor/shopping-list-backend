@@ -10,8 +10,11 @@ async def test_user_can_access_items_from_permitted_list(client: TestClient, ses
     from app.service.auth import hash_string_password
     hashed_password = hash_string_password("testpassword")
     user = User(name="Test User", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user)
@@ -47,9 +50,13 @@ async def test_user_cannot_access_items_from_non_permitted_list(client: TestClie
     hashed_password = hash_string_password("testpassword")
     user1 = User(name="User 1", hashed_password=hashed_password)
     user2 = User(name="User 2", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user1)
     session.add(user2)
+    session.commit()
+    session.refresh(user1)
+    session.refresh(user2)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user1.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user1)

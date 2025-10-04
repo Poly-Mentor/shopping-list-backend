@@ -10,8 +10,11 @@ async def test_user_has_access_to_list(session):
     from app.service.auth import hash_string_password
     hashed_password = hash_string_password("testpassword")
     user = User(name="Test User", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user)
@@ -37,8 +40,11 @@ async def test_user_has_access_to_list_no_permission(session):
     from app.service.auth import hash_string_password
     hashed_password = hash_string_password("testpassword")
     user = User(name="Test User", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user)
@@ -59,8 +65,11 @@ async def test_grant_access_to_list(session):
     from app.service.auth import hash_string_password
     hashed_password = hash_string_password("testpassword")
     user = User(name="Test User", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user)
@@ -85,8 +94,15 @@ async def test_grant_access_to_list(session):
 @pytest.mark.asyncio
 async def test_grant_access_to_list_user_not_found(session):
     """Test granting access to a list when the user doesn't exist."""
-    # Create a shopping list
-    shopping_list = ShoppingList(name="Test List")
+    # Create a user and shopping list
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(shopping_list)
@@ -129,8 +145,11 @@ async def test_revoke_access_to_list(session):
     from app.service.auth import hash_string_password
     hashed_password = hash_string_password("testpassword")
     user = User(name="Test User", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user)
@@ -162,8 +181,11 @@ async def test_revoke_access_to_list_not_found(session):
     from app.service.auth import hash_string_password
     hashed_password = hash_string_password("testpassword")
     user = User(name="Test User", hashed_password=hashed_password)
-    shopping_list = ShoppingList(name="Test List")
     session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(user)

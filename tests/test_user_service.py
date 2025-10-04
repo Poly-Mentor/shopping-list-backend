@@ -168,8 +168,8 @@ async def test_get_user_lists(session):
     # Ensure the id is not None
     assert user.id is not None
     
-    list1 = ShoppingList(name="List 1")
-    list2 = ShoppingList(name="List 2")
+    list1 = ShoppingList(name="List 1", owner_id=user.id)
+    list2 = ShoppingList(name="List 2", owner_id=user.id)
     session.add(list1)
     session.add(list2)
     session.commit()

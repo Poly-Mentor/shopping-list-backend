@@ -2,7 +2,7 @@ from app.models import *
 from app.data import db
 from sqlmodel import select
 from fastapi import HTTPException, status
-from app.service.user import CurrentUserDep
+
 
 async def get_all_lists(session: db.DBSessionDep) -> list[ShoppingList]:
     """Fetch all lists from the database."""
@@ -54,18 +54,30 @@ async def delete_list(list_id: int, user: User, session: db.DBSessionDep) -> dic
 
 # Item operations
 
-async def get_items_from_list(list_id: int, session: db.DBSessionDep) -> list[ShoppingItem]:
+async def get_items_from_list(list_id: int, user: User, session: db.DBSessionDep) -> list[ShoppingItem]:
     shoppinglist = await get_list_by_id(list_id, session)
+    if user != shoppinglist.owner:
+        if shoppinglist.users is not None:
+            if user not in shoppinglist.users:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You must be an owner or user with permissions to the list to read its contents.")
     if not shoppinglist.items:
         return []
     return shoppinglist.items
 
 async def add_item(
         list_id: int,
+        user: User,
         input_item: ShoppingItemCreate,
         session: db.DBSessionDep
 ) -> ShoppingItem:
+    # get list
     parent_list = await get_list_by_id(list_id, session)
+    # check permissions
+    if user != parent_list.owner:
+        if parent_list.users is not None:
+            if user not in parent_list.users:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You must be an owner or user with permissions to the list to add to its contents.")
+
     if not parent_list.items:
         parent_list.items = []
     ShoppingItemCreate.model_validate(input_item)

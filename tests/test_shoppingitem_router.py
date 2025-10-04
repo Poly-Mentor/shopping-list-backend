@@ -1,13 +1,20 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from app.models import ShoppingList, ShoppingItem
+from app.models import ShoppingList, ShoppingItem, User
 
 @pytest.mark.asyncio
 async def test_update_item(client: TestClient, session: Session):
     """Test updating a shopping item."""
-    # Create a shopping list
-    shopping_list = ShoppingList(name="Test List")
+    # Create a user and shopping list
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(shopping_list)
@@ -52,8 +59,15 @@ async def test_update_item_not_found(client: TestClient):
 @pytest.mark.asyncio
 async def test_delete_item(client: TestClient, session: Session):
     """Test deleting a shopping item."""
-    # Create a shopping list
-    shopping_list = ShoppingList(name="Test List")
+    # Create a user and shopping list
+    from app.service.auth import hash_string_password
+    hashed_password = hash_string_password("testpassword")
+    user = User(name="Test User", hashed_password=hashed_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    shopping_list = ShoppingList(name="Test List", owner_id=user.id)
     session.add(shopping_list)
     session.commit()
     session.refresh(shopping_list)

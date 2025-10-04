@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.models import ShoppingList, ShoppingListCreate, ShoppingItem, User
+from app.models import ShoppingList, ShoppingListCreate, ShoppingItem, ShoppingItemCreate, User
 from app.data.db import DBSessionDep
 import app.service.shoppinglist
 import app.service.shoppingitem
@@ -61,19 +61,25 @@ async def delete_shopping_list(
 @router.get("/{list_id}/items")
 async def get_items_from_list(
     list_id: int,
-    result = Depends(app.service.shoppinglist.get_items_from_list)
+    session: DBSessionDep,
+    user: User = Depends(get_current_user)
 ) -> list[ShoppingItem]:
+    result = await app.service.shoppinglist.get_items_from_list(list_id=list_id, session=session, user=user)
     return result
 
 @router.post("/{list_id}/items")
 async def add_item(
     list_id: int,
-    new_item: ShoppingItem = Depends(app.service.shoppinglist.add_item)
+    input_item: ShoppingItemCreate,
+    session: DBSessionDep,
+    user: User = Depends(get_current_user)
 ) -> ShoppingItem:
+    new_item = await app.service.shoppinglist.add_item(list_id=list_id, user=user, input_item=input_item, session=session)
     return new_item
 
 # Operations on individual items
 
+# TODO add authentication and permissions checks
 @router.patch("/items/{item_id}")
 async def update_item(
     item_id: int,
